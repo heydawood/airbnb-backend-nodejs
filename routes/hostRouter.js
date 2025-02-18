@@ -1,24 +1,13 @@
-// Core Module
-const path = require('path');
 
 // External Module
 const express = require('express');
 const hostRouter = express.Router();
 
 // Local Module
-const rootDir = require("../utils/pathUtil");
+const homesController = require('../controllers/homes') //controller giving data to routers
 
-hostRouter.get("/add-home", (req, res, next) => {
-  res.render('addHome', {pageTitle: 'Add Home to airbnb', currentPage: 'addHome'} );
-})
 
-const registeredHomes = [];
-
-hostRouter.post("/add-home", (req, res, next) => {
-  console.log('Home Registration successful for:', req.body);
-  registeredHomes.push(req.body);
-  res.render('homeAdded', {pageTitle: 'Home Added Successfully' , currentPage: 'homeAdded'});
-})
+hostRouter.get("/add-home", homesController.getAddHome)   //router
+hostRouter.post("/add-home", homesController.postAddHome) //router
 
 exports.hostRouter = hostRouter;
-exports.registeredHomes = registeredHomes;
