@@ -1,7 +1,21 @@
 const Home = require("../models/home");
 
 exports.getAddHome = (req, res, next) => {
-  res.render('host/addHome', { pageTitle: 'Add Home to airbnb', currentPage: 'addHome' });
+  res.render('host/edit-home', { pageTitle: 'Add Home to airbnb', currentPage: 'addHome', editing: false });
+}
+
+exports.getEditHome = (req, res, next) => {
+  const homeId = req.params.homeId;
+  const editing = req.query.editing === 'true' ;
+
+  Home.findById(homeId, home=>{
+    if(!home){
+      console.log('Home not found')
+    return  res.redirect('/host/host-home-list')
+    }
+    console.log(homeId, editing, home)
+    res.render('host/edit-home', { home:home, pageTitle: 'Edit Home', currentPage: 'host-homes', editing: editing });
+  })
 }
 
 
@@ -9,8 +23,16 @@ exports.postAddHome = (req, res, next) => {
   const { houseName, price, location, ratings, photoUrl } = req.body;  //destructure
   const home = new Home(houseName, price, location, ratings, photoUrl)
   home.save();
+  res.redirect('host/host-home-list');
+}
 
-  res.render('host/home-added', { pageTitle: 'Home Added Successfully', currentPage: 'homeAdded' });
+exports.postEditHome = (req, res, next) => {
+  const { id, houseName, price, location, ratings, photoUrl } = req.body;  //destructure
+  const home = new Home(houseName, price, location, ratings, photoUrl)
+  home.id = id;
+  home.save();
+
+  res.redirect('/host/host-home-list');
 }
 
 exports.getHostHomes = (req, res, next) => {

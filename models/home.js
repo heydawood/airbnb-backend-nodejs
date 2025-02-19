@@ -1,13 +1,11 @@
 // Core Modules
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 //Local Modules
-const rootDir = require('../utils/pathUtil')
+const rootDir = require("../utils/pathUtil");
 
-
-const homeDataPath = path.join(rootDir, 'data', 'homes.json'); // reading data from local storage
-
+const homeDataPath = path.join(rootDir, "data", "homes.json"); // reading data from local storage
 
 module.exports = class Home {
     constructor(houseName, price, location, ratings, photoUrl) {
@@ -19,27 +17,34 @@ module.exports = class Home {
     }
 
     save() {
-        this.id = Math.random().toString();
-        Home.fetchAll(registeredHomes => {
-            registeredHomes.push(this)
-            fs.writeFile(homeDataPath, JSON.stringify(registeredHomes), error => {
-                console.log('File writing concluded', error)
-            });
-        })
-    }
+        Home.fetchAll((registeredHomes) => {
 
-    static fetchAll(callback) {                // adding callback because reading file is async function data is coming from controller homes.js/getHomes function
-        
-        fs.readFile(homeDataPath, (err, data) => {
-            callback(!err ? (JSON.parse(data)) : [])
+            if (this.id) { //edit home case
+                registeredHomes = registeredHomes.map(home =>
+                     home.id === this.id ? this : home)
+                     
+            } else { //add home case
+                this.id = Math.random().toString();
+                registeredHomes.push(this);
+            }
+            fs.writeFile(homeDataPath, JSON.stringify(registeredHomes), (error) => {
+                console.log("File writing concluded", error);
+            });
         });
     }
 
-    static findById(homeId, callback){
-        this.fetchAll(homes =>{
-            const homeFound = homes.find(home => home.id === homeId);
-            callback(homeFound)
-        })
+    static fetchAll(callback) {
+        // adding callback because reading file is async function data is coming from controller homes.js/getHomes function
+
+        fs.readFile(homeDataPath, (err, data) => {
+            callback(!err ? JSON.parse(data) : []);
+        });
     }
 
-}
+    static findById(homeId, callback) {
+        this.fetchAll((homes) => {
+            const homeFound = homes.find((home) => home.id === homeId);
+            callback(homeFound);
+        });
+    }
+};
