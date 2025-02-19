@@ -13,4 +13,6 @@ storeRouter.get("/homes", storeController.getHomes); //router and second argumen
 storeRouter.get("/bookings", storeController.getBookings); //router and second argument is controller
 storeRouter.get("/favourites", storeController.getFavouriteList); //router and second argument is controller
 
+storeRouter.get("/homes/:homeId", storeController.getHomeDetails); //router and second argument is controller
+
 module.exports = storeRouter;

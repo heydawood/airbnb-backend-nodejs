@@ -9,7 +9,7 @@
       <div class="flex flex-wrap justify-center gap-6">
         <% registeredHomes.forEach(home => { %>
           <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 w-full max-w-sm">
-            <img class="object-cover" src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1">
+            <img class="object-cover" src="<%= home.photoUrl %>">
             <div class="p-4">
               <h3 class="text-xl font-semibold text-gray-800 mb-2"><%= home.houseName %></h3>
               <p class="text-gray-600 mb-2"><i class="fas fa-map-marker-alt mr-2"></i><%= home.location %></p>
@@ -20,7 +20,8 @@
                   <span class="text-gray-700"><%= home.ratings %></span>
                 </div>
               </div>
-              <button class="bg-green-500 p-2 " >Book</button>
+              <a class="bg-blue-500 p-2 rounded-md text-white" href="/homes/<%= home.id %>">Details</a>
+              <button class="bg-green-500 p-2 rounded-md text-white" >Book</button>
             </div>
           </div>
         <% }) %>

@@ -6,6 +6,9 @@ const path = require('path');
 const rootDir = require('../utils/pathUtil')
 
 
+const homeDataPath = path.join(rootDir, 'data', 'homes.json'); // reading data from local storage
+
+
 module.exports = class Home {
     constructor(houseName, price, location, ratings, photoUrl) {
         this.houseName = houseName;
@@ -16,9 +19,9 @@ module.exports = class Home {
     }
 
     save() {
+        this.id = Math.random().toString();
         Home.fetchAll(registeredHomes => {
             registeredHomes.push(this)
-            const homeDataPath = path.join(rootDir, 'data', 'homes.json'); //saving data into local storage coming from client
             fs.writeFile(homeDataPath, JSON.stringify(registeredHomes), error => {
                 console.log('File writing concluded', error)
             });
@@ -26,9 +29,17 @@ module.exports = class Home {
     }
 
     static fetchAll(callback) {                // adding callback because reading file is async function data is coming from controller homes.js/getHomes function
-        const homeDataPath = path.join(rootDir, 'data', 'homes.json'); // reading data from local storage
+        
         fs.readFile(homeDataPath, (err, data) => {
             callback(!err ? (JSON.parse(data)) : [])
         });
     }
+
+    static findById(homeId, callback){
+        this.fetchAll(homes =>{
+            const homeFound = homes.find(home => home.id === homeId);
+            callback(homeFound)
+        })
+    }
+
 }
