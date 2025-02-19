@@ -6,6 +6,7 @@ const path = require('path');
 const rootDir = require('../utils/pathUtil')
 
 
+
 const favouriteDataPath = path.join(rootDir, 'data', 'favourite.json'); // reading data from local storage
 
 
@@ -29,5 +30,10 @@ module.exports = class Favourite {
         });
     }
 
-
-}
+    static deleteById(delHomeId, callback) {
+        Favourite.getFavourites(homeIds => {
+          homeIds = homeIds.filter(homeId => delHomeId !== homeId);
+          fs.writeFile(favouriteDataPath, JSON.stringify(homeIds),callback);
+        })
+      }
+    };

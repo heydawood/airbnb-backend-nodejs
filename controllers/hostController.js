@@ -6,15 +6,15 @@ exports.getAddHome = (req, res, next) => {
 
 exports.getEditHome = (req, res, next) => {
   const homeId = req.params.homeId;
-  const editing = req.query.editing === 'true' ;
+  const editing = req.query.editing === 'true';
 
-  Home.findById(homeId, home=>{
-    if(!home){
+  Home.findById(homeId, home => {
+    if (!home) {
       console.log('Home not found')
-    return  res.redirect('/host/host-home-list')
+      return res.redirect('/host/host-home-list')
     }
     console.log(homeId, editing, home)
-    res.render('host/edit-home', { home:home, pageTitle: 'Edit Home', currentPage: 'host-homes', editing: editing });
+    res.render('host/edit-home', { home: home, pageTitle: 'Edit Home', currentPage: 'host-homes', editing: editing });
   })
 }
 
@@ -33,6 +33,16 @@ exports.postEditHome = (req, res, next) => {
   home.save();
 
   res.redirect('/host/host-home-list');
+}
+exports.postDeleteHome = (req, res, next) => {
+  const homeId = req.params.homeId
+  console.log('came to delete', homeId)
+  Home.deleteById(homeId, error => {
+    if (error) {
+      console.log('Error while deleting', error)
+    }
+    res.redirect('/host/host-home-list');
+  })
 }
 
 exports.getHostHomes = (req, res, next) => {
