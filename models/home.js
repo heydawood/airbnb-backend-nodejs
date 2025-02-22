@@ -1,62 +1,60 @@
-// Core Modules
-const fs = require("fs");
-const path = require("path");
-
-//Local Modules
-const rootDir = require("../utils/pathUtil");
-const Favourite = require("./favourites");
+const { ObjectId } = require("mongodb");
+const { getDB } = require("../utils/databaseUtil");
 
 
 
-const homeDataPath = path.join(rootDir, "data", "homes.json"); // reading data from local storage
+
 
 module.exports = class Home {
-    constructor(houseName, price, location, ratings, photoUrl) {
+    constructor(houseName, price, location, ratings, photoUrl, description, _id) {
         this.houseName = houseName;
         this.price = price;
         this.location = location;
         this.ratings = ratings;
         this.photoUrl = photoUrl;
+        this.description = description;
+        if (_id) {
+            this._id = _id;
+        }
     }
 
     save() {
-        Home.fetchAll((registeredHomes) => {
+        const db = getDB();
 
-            if (this.id) { //edit home case
-                registeredHomes = registeredHomes.map(home =>
-                     home.id === this.id ? this : home)
-                     
-            } else { //add home case
-                this.id = Math.random().toString();
-                registeredHomes.push(this);
+        if (this._id) {  //updating current home details
+
+            const updtedValues = {
+                houseName: this.houseName,
+                price: this.price,
+                location: this.location,
+                ratings: this.ratings,
+                photoUrl: this.photoUrl,
+                description: this.description
             }
-            fs.writeFile(homeDataPath, JSON.stringify(registeredHomes), (error) => {
-                console.log("File writing concluded", error);
-            });
-        });
+
+            return db.collection('homes').updateOne({ _id: new ObjectId(String(this._id)) }, { $set: updtedValues })
+
+
+        } else { //adding new home details
+            return db.collection('homes').insertOne(this);
+        }
     }
 
-    static fetchAll(callback) {
-        // adding callback because reading file is async function data is coming from controller homes.js/getHomes function
-
-        fs.readFile(homeDataPath, (err, data) => {
-            callback(!err ? JSON.parse(data) : []);
-        });
+    static fetchAll() {
+        const db = getDB();
+        return db.collection('homes').find().toArray();
     }
 
-    static findById(homeId, callback) {
-        this.fetchAll((homes) => {
-            const homeFound = homes.find((home) => home.id === homeId);
-            callback(homeFound);
-        });
+    static findById(homeId) {
+        const db = getDB();
+        return db.collection('homes')
+            .find({ _id: new ObjectId(String(homeId)) })
+            .next();
     }
 
-    static deleteById(homeId, callback) {
-        this.fetchAll((homes) => {
-            homes = homes.filter(home => home.id !== homeId);
-            fs.writeFile(homeDataPath, JSON.stringify(homes), error=>{
-                Favourite.deleteById(homeId, callback)
-            })
-        });
+    static deleteById(homeId) {
+        const db = getDB();
+        return db.collection('homes')
+            .deleteOne({ _id: new ObjectId(String(homeId)) })
     }
 };
